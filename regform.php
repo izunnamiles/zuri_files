@@ -16,14 +16,14 @@ if(isset($_POST['submit_data'])){
     'password'=> $password,
   );
   if(!file_exists('files/'.$username.".json")){
-    $filed = file_put_contents('files/'.$username.".json",json_encode($data));
-    if($filed===true){
-      $_SESSION['full_name'] = $fname." ".$lname;
+      $filed = file_put_contents('files/'.$username.".json",json_encode($data));
+      $_SESSION['full_name'] = $fName." ".$lName;
       $_SESSION['username'] = $username;
   
       header("location:home.php");
-    }
-  }die("Username is already taken");
+      die();
+    
+  }else die("Username is already taken");
 
   
 }
@@ -38,7 +38,6 @@ if(isset($_POST['login_data'])){
     $passcode = $file_array['password'];
   
     if($password == $passcode){
-      echo $passcode.'<br>';
       $_SESSION['full_name'] = $file_array['first_name']." ".$file_array['last_name'];
       $_SESSION['username'] = $file_array['username'];
       header("location:home.php");
@@ -46,7 +45,35 @@ if(isset($_POST['login_data'])){
   }else echo "username not found";
 }
 
+if(isset($_POST['forgot'])){
+  $username = trim($_POST['username']);
+  $email = trim($_POST['email']);
 
+  if(file_exists('files/'.$username.".json")){
+    $file = file_get_contents('files/'.$username.".json");
+    $file_array = json_decode($file, true);
+    $mail = $file_array['email'];
+  
+    if($mail == $email){
+      $_SESSION['reset']= $username;
+      header("location:reset.php");
+    }else {echo "Incorrect Email";}
+  }else echo "username not found";
+}
+if(isset($_POST['reset'])){
+  $username = $_SESSION['reset'];
+  $password1 = trim($_POST['password']);
+  $password2 = trim($_POST['con_password']);
+
+  if(file_exists('files/'.$username.".json")){
+    $file = file_get_contents('files/'.$username.".json");
+    $file_array = json_decode($file, true);
+    $file_array['password'] = $password1;   
+    $file_array = json_encode($file_array);
+    header("location:login.php");
+   
+  }else echo "username not found";
+}
 
 
 
